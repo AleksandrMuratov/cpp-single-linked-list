@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <utility>
 #include <iterator>
+#include <cassert>
 
 template <typename Type>
 class SingleLinkedList {
@@ -47,9 +48,11 @@ class SingleLinkedList {
             return it_old;
         }
         [[nodiscard]] reference operator*() const noexcept {
+            assert(node_ != nullptr);
             return node_->value;
         }
         [[nodiscard]] pointer operator->() const noexcept {
+            assert(node_ != nullptr);
             return &(node_->value);
         }
     private:
@@ -129,6 +132,7 @@ public:
     }
 
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
+        assert(pos.node_ != nullptr);
         Node* new_node = new Node(value, pos.node_->next_node);
         pos.node_->next_node = new_node;
         ++size_;
@@ -136,13 +140,16 @@ public:
     }
 
     void PopFront() noexcept {
-        Node* front_node = head_->next_node;
-        head_->next_node = head_->next_node->next_node;
-        --size_;
-        delete front_node;
+        if (size_ > 0) {
+            Node* front_node = head_->next_node;
+            head_->next_node = head_->next_node->next_node;
+            --size_;
+            delete front_node;
+        }
     }
 
     Iterator EraseAfter(ConstIterator pos) noexcept {
+        assert((pos.node_ != nullptr) && (pos.node_->next_node != nullptr));
         Node* erase_node = pos.node_->next_node;
         pos.node_->next_node = pos.node_->next_node->next_node;
         delete erase_node;
